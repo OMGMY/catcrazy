@@ -1,5 +1,7 @@
 package com.example.cat;
 
+import java.util.IllegalFormatCodePointException;
+
 import android.R.integer;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -26,11 +28,14 @@ public class backImage extends SurfaceView implements OnTouchListener {
 	private static final int COLNUMBER=10;
     public  static  final int OBSERVE=10;
     public static int length=30;
-
+    private point cat;
+    public  static  int CATX=4;
+    public  static  int CATY=5;
+    Context mContext;
 	public backImage(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
-		
+		mContext=context;
 		matrix=new point[ROWNUMBER][COLNUMBER];
 		for(int i=0;i<ROWNUMBER;i++){
 			for(int j=0;j<COLNUMBER;j++)
@@ -51,6 +56,7 @@ public class backImage extends SurfaceView implements OnTouchListener {
 			}
 		}
 		matrix[4][5].setPointStatus(point.CATSTAND);
+		cat=matrix[4][5];
 		System.out.println(matrix[4][5].getPointStatus()+"System.out.println(matrix[y][x].getPointStatus());");
 		for (int i = 0; i < OBSERVE;) {
 			int x=(int) (((Math.random()*1000)%COLNUMBER));
@@ -125,7 +131,7 @@ public class backImage extends SurfaceView implements OnTouchListener {
 		// TODO Auto-generated method stub
 		if(event.getAction()==MotionEvent.ACTION_UP)
 		{
-			Toast.makeText(getContext(), event.getX()+":"+event.getY(), Toast.LENGTH_SHORT).show();
+		//	Toast.makeText(getContext(), event.getX()+":"+event.getY(), Toast.LENGTH_SHORT).show();
 			int x,y;
 			
 			y=(int) (event.getY()/length);
@@ -138,17 +144,81 @@ public class backImage extends SurfaceView implements OnTouchListener {
 			}
 			if(x+1>COLNUMBER||y+1>ROWNUMBER)
 			{
-				System.out.println(length+"");
+				/*System.out.println(length+"");
 				System.out.println(event.getX()+"");
-				System.out.println("x  y"+x+y);
+				System.out.println("x  y"+x+y);*/
 				init();
 			}
 			else if(matrix[y][x].getPointStatus()==point.POINTUNCHECKED)
 			{
-				matrix[y][x].setPointStatus(point.POINTCHECKED);	
+				matrix[y][x].setPointStatus(point.POINTCHECKED);
+				moveOneStep();
 			}
+			else 
+				{
+					
+				}
+			
 			drawImage();
 		}
 		return true;
+	}
+	private void moveOneStep() {
+		 int cxr,cyb,cxl,cyt;
+		 cxr=CATX+1;
+		 cyb=CATY+1;
+		 cxl=CATX-1;
+		 cyt=CATY-1;
+		 if(CATX==0||CATY==0||(CATX==COLNUMBER-1)||(CATY==ROWNUMBER-1))
+		 {
+			 youLose();
+			 return;
+		 }else {
+			 getnext(cxr,cyb,cxl,cyt);
+			 return;
+		}
+		
+		
+	}
+	private void getnext(int cxr, int cyb, int cxl, int cyt) {
+		if(matrix[cxr][CATY].pointStatus==point.POINTUNCHECKED)
+		{
+			matrix[CATX][CATY].pointStatus=point.POINTUNCHECKED;
+			matrix[cxr][CATY].pointStatus=point.CATSTAND;
+			CATX=cxr;
+			return;
+		} if(matrix[CATX][cyt].pointStatus==point.POINTUNCHECKED)
+		{
+			matrix[CATX][CATY].pointStatus=point.POINTUNCHECKED;
+			matrix[CATX][cyt].pointStatus=point.CATSTAND;
+			CATY=cyt;
+			return;
+		}
+		if(matrix[cxl][CATY].pointStatus==point.POINTUNCHECKED)
+		{
+			matrix[CATX][CATY].pointStatus=point.POINTUNCHECKED;
+			matrix[cxl][CATY].pointStatus=point.CATSTAND;
+			CATX=cxl;
+			return;
+		}
+		if(matrix[cyb][CATY].pointStatus==point.POINTUNCHECKED)
+		{
+			matrix[CATX][CATY].pointStatus=point.POINTUNCHECKED;
+			matrix[CATX][cyb].pointStatus=point.CATSTAND;
+			CATY=cyb;	
+			return;
+		}
+	 
+			youWin();
+		
+		
+	}
+	private void youWin() {
+		// TODO Auto-generated method stub
+		Toast.makeText(mContext, "you win", 3000).show();
+	}
+	private void youLose() {
+		Toast.makeText(mContext, "you lose", 3000).show();
+		
 	}
 }
